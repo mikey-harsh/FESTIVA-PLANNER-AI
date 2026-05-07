@@ -11,10 +11,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy backend code
 COPY . .
 
-# Pre-build only light components. 
-#  using Cloud Embeddings.
+# We ONLY pre-bake the ML model because it does not need an API key.
+# We removed the RAG line because it requires an API key to initialize.
 RUN python -c "from ml_optimizer import BudgetOptimizer; BudgetOptimizer()"
-RUN python -c "from rag import RAGKnowledgeBase; RAGKnowledgeBase()"
 
 # Expose port
 EXPOSE 8000
