@@ -1,5 +1,5 @@
 # Build stage
-FROM node:18-alpine AS build
+FROM node:20-slim AS build
 
 WORKDIR /app
 
@@ -7,20 +7,24 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# Copy source code and build
+# Copy all source code
 COPY . .
-# Setting this arg allows you to pass API URL at build time if needed
+
+# Pass the Backend URL during the build process
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
+
+# Build the React app
 RUN npm run build
 
-# Production serving stage
-FROM nginx:alpine
+# Production serving stage (using Nginx)
+FROM nginx:stable-alpine
 
-# Copy the build output to Nginx's web folder
+# Copy the built files to Nginx
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Expose port 80
+# Expose the port Nginx uses
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
+
