@@ -22,7 +22,7 @@ class BudgetOptimizer:
     def _generate_dummy_data(self):
         # Generate dummy data for training
         np.random.seed(42)
-        n_samples = 1000
+        n_samples = 50
         data = {
             "budget": np.random.uniform(50000, 10000000, n_samples),
             "event_type_encoded": np.random.choice([0, 1, 2], n_samples), # 0: Wedding/Traditional, 1: Corporate/Formal, 2: Casual/Party

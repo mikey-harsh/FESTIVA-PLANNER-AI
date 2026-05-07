@@ -2,6 +2,9 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
+# Crucial for seeing logs in Render!
+ENV PYTHONUNBUFFERED=1
+
 # Install dependencies required for FAISS and compiling C++ extensions
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
