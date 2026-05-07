@@ -1,6 +1,6 @@
-from langchain_community.document_loaders import TextLoader
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import os
 
@@ -8,7 +8,11 @@ class RAGKnowledgeBase:
     def __init__(self):
         self.data_dir = "knowledge_data"
         self.index_path = "faiss_index"
-        self.embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        
+        # FIX: Using Google's cloud embeddings to save RAM
+        # This replaces HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        self.embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+        
         self.vector_store = None
         
         self._ensure_data_exists()
@@ -47,6 +51,8 @@ Pricing: 5-Star Venues (₹3000-₹5000/plate). Banquets (₹1000-₹2000/plate)
                     f.write(content)
 
     def _load_or_build_index(self):
+        # NOTE: If you have an old 'faiss_index' folder, delete it from your repo
+        # so it can be rebuilt using the new Google embeddings.
         if os.path.exists(self.index_path):
             self.vector_store = FAISS.load_local(self.index_path, self.embeddings, allow_dangerous_deserialization=True)
         else:
