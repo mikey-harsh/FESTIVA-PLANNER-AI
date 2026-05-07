@@ -5,6 +5,7 @@ pandas
 langchain
 langchain-community
 langchain-google-genai
+langchain-openai
 google-generativeai
 faiss-cpu
 python-dotenv
