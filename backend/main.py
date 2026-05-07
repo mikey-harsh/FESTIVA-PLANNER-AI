@@ -9,7 +9,10 @@ app = FastAPI(title="Festiva Planner AI")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=[
+        "https://festiva-planner-ai-ui.onrender.com", # Your live frontend
+        "http://localhost:5173",                     # Local development
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
