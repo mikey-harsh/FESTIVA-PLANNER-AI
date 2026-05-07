@@ -12,6 +12,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy backend code
 COPY . .
 
+# CRITICAL FIX: Pre-download the HuggingFace model and pre-build the FAISS/ML models 
+# DURING the Docker build phase, so the server starts instantly at runtime!
+RUN python -c "from langchain_huggingface import HuggingFaceEmbeddings; HuggingFaceEmbeddings(model_name='all-MiniLM-L6-v2')"
+RUN python -c "from ml_optimizer import BudgetOptimizer; BudgetOptimizer()"
+RUN python -c "from rag import KnowledgeBase; KnowledgeBase()"
+
 # Expose port
 EXPOSE 8000
 
