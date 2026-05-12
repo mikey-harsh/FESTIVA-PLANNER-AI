@@ -27,3 +27,15 @@
   align-items: flex-start;
   width: 100%;
 }
+
+.btn:disabled {
+  background: linear-gradient(90deg, #4b5563, #1f2937, #4b5563) !important;
+  background-size: 200% 100% !important;
+  animation: loading-shimmer 1.5s infinite linear;
+  cursor: wait;
+}
+
+@keyframes loading-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

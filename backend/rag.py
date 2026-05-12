@@ -1,78 +1,38 @@
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_community.document_loaders import TextLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 import os
+import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 class RAGKnowledgeBase:
     def __init__(self):
         self.data_dir = "knowledge_data"
-        self.index_path = "faiss_index"
-        
-        # FIX: Using Google's cloud embeddings to save RAM
-        # This replaces HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-        self.embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-        
-        self.vector_store = None
-        
-        self._ensure_data_exists()
-        self._load_or_build_index()
+        self.documents = []
+        self.vectorizer = TfidfVectorizer(stop_words='english')
+        self.tfidf_matrix = None
+        self._load_local_data()
 
-    def _ensure_data_exists(self):
-        if not os.path.exists(self.data_dir):
-            os.makedirs(self.data_dir)
-            
-        dummy_guides = {
-            "indian_vendor_directory.txt": """
-# Indian Vendor Directory
-## Mumbai
-Venues: The Taj Mahal Palace, Sahara Star, ITC Maratha. Caterers: Mini Punjab Catering, Foodlink. Decor: National Decorators. Photography: The Wedding Story.
-## Delhi
-Venues: Taj Palace, ITC Maurya, The Leela Ambience. Caterers: Saltt Catering, The Kitchen Art Co. Decor: Ferns N Petals. Photography: Badal Raja Company.
-## Bangalore
-Venues: The Leela Palace, Taj West End, Bangalore Palace Grounds. Caterers: Sagar Caterers, Sri Udupi Caterers. Decor: Ohana Fine Events. Photography: Lightbucket Productions.
-## Hyderabad
-Venues: Taj Falaknuma Palace, ITC Kakatiya. Caterers: Fusion Hospitality, Vantillu Caterers. Decor: Minttu Decorators. Photography: RVR Pro.
-## Chennai
-Venues: ITC Grand Chola, Mayor Ramanathan Chettiar Hall. Caterers: A2B Catering, Saraswathi Caterers. Decor: Marriage Colours. Photography: Studio A.
-## General Guidelines for Any Indian City
-If a specific city is not listed above, infer realistic local Indian names for that city (e.g., 'Royal Residency Banquet', 'Shree Krishna Caterers', 'Mahalaxmi Decorators', 'Perfect Click Studios').
-Pricing: 5-Star Venues (₹3000-₹5000/plate). Banquets (₹1000-₹2000/plate). Kalyana Mandapams (₹500-₹1000/plate). Photography (₹50k-₹3 Lakhs/day). Decor (₹1 Lakh-₹10 Lakhs).
-""",
-            "wedding_guide.txt": "Indian weddings span 6-12 months of planning. Booking venues (Mandapams/Banquets) requires 8-10 months lead time, especially during Shubh Muhurat dates. Catering and Decor are finalized 4 months prior.",
-            "corporate_guide.txt": "Corporate events require rigid scheduling. Timelines are usually 2-6 months. Key focus areas: A/V equipment, premium hotel venues, catering, and guest speakers.",
-            "party_guide.txt": "Birthdays, Anniversaries, and Baby Showers can be planned in 1-2 months. Focus heavily on food and entertainment. Book local banquets or hotel halls."
-        }
-        
-        for filename, content in dummy_guides.items():
-            filepath = os.path.join(self.data_dir, filename)
-            if not os.path.exists(filepath):
-                with open(filepath, "w") as f:
-                    f.write(content)
-
-    def _load_or_build_index(self):
-        # NOTE: If you have an old 'faiss_index' folder, delete it from your repo
-        # so it can be rebuilt using the new Google embeddings.
-        if os.path.exists(self.index_path):
-            self.vector_store = FAISS.load_local(self.index_path, self.embeddings, allow_dangerous_deserialization=True)
-        else:
-            documents = []
+    def _load_local_data(self):
+        # Instantly loads your .txt guides from the folder
+        if os.path.exists(self.data_dir):
             for filename in os.listdir(self.data_dir):
                 if filename.endswith(".txt"):
-                    loader = TextLoader(os.path.join(self.data_dir, filename))
-                    documents.extend(loader.load())
+                    filepath = os.path.join(self.data_dir, filename)
+                    with open(filepath, 'r', encoding='utf-8') as f:
+                        self.documents.append(f.read())
             
-            text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-            texts = text_splitter.split_documents(documents)
-            
-            if texts:
-                self.vector_store = FAISS.from_documents(texts, self.embeddings)
-                self.vector_store.save_local(self.index_path)
+            if self.documents:
+                self.tfidf_matrix = self.vectorizer.fit_transform(self.documents)
+                print(f"✅ Local Knowledge Engine Ready ({len(self.documents)} guides loaded)")
 
-    def query(self, question: str, k: int = 2) -> str:
-        if not self.vector_store:
-            return "Knowledge base not initialized."
-        docs = self.vector_store.similarity_search(question, k=k)
-        if docs:
-            return "\n".join([doc.page_content for doc in docs])
-        return "No relevant knowledge found."
+    def query(self, question: str, k: int = 1) -> str:
+        # Uses local math to find the right guide in 0ms
+        if not self.documents or self.tfidf_matrix is None:
+            return "Standard Indian Event Guidelines."
+            
+        query_vec = self.vectorizer.transform([question])
+        scores = cosine_similarity(query_vec, self.tfidf_matrix).flatten()
+        best_index = np.argmax(scores)
+        
+        if scores[best_index] > 0.1:
+            return self.documents[best_index][:1000]
+        return "Standard Indian Event Guidelines."

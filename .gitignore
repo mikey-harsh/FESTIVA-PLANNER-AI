@@ -1,15 +1,23 @@
-# General
+# --- Python / Backend ---
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
 .env
-.DS_Store
-*.zip
-
-# Backend
-backend/venv/
-backend/__pycache__/
-backend/*.pyc
-backend/budget_model.pkl
+backend/.env
+plan_cache.json
+backend/plan_cache.json
+faiss_index/
 backend/faiss_index/
 
-# Frontend
+# --- Node / Frontend ---
+node_modules/
 frontend/node_modules/
+dist/
 frontend/dist/
+.DS_Store
+
+# --- Local IDE ---
+.vscode/
+.idea/

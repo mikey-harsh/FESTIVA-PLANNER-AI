@@ -7,38 +7,37 @@ import os
 
 app = FastAPI(title="Festiva Planner AI")
 
+# This is the "Door" that lets the frontend in
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://festiva-planner-ai-ui.onrender.com", # Your live frontend
-        "http://localhost:5173",                     # Local development
-    ],
+    allow_origins=["*"], # Allows any local connection
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Global variable for lazy loading
+# Global variable for agents
 planner_agents = None
 
-def get_planner():
+@app.on_event("startup")
+async def startup_event():
     global planner_agents
-    if planner_agents is None:
+    try:
         planner_agents = EventPlannerAgents()
-    return planner_agents
+        print("✅ Backend Agents Ready!")
+    except Exception as e:
+        print(f"❌ Error starting agents: {e}")
 
 @app.post("/api/plan", response_model=PlannerResponse)
 async def plan_event(request: EventRequest):
-    # Initialize agents only when the first request hits
-    agents = get_planner()
-    response = agents.plan_event(request)
-    return response
+    if planner_agents is None:
+        return {"error": "Agents not initialized"}
+    return planner_agents.plan_event(request)
 
 @app.get("/api/health")
 def health_check():
     return {"status": "ok"}
 
 if __name__ == "__main__":
-    # Use the PORT environment variable if provided by Render
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)

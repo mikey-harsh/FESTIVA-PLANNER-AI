@@ -1,12 +1,24 @@
 .form-wrapper {
   width: 100%;
-  max-width: 500px;
+  max-width: 550px;
+  margin: 60px auto; /* Adds significant breathing room at the top and bottom */
+  padding: 3.5rem;
+  background: var(--card);
+  backdrop-filter: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 .form-wrapper h2 {
-  margin-bottom: 2rem;
+  font-size: 2.5rem;
+  font-weight: 800;
   text-align: center;
-  color: var(--text-main);
+  margin-bottom: 3rem;
+  background: linear-gradient(to bottom right, #ffffff 30%, var(--muted) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.03em;
 }
 
 .event-form {
@@ -14,31 +26,99 @@
   flex-direction: column;
 }
 
-.submit-btn {
-  margin-top: 1rem;
-  width: 100%;
+.input-group {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
+.input-group label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-left: 4px;
+}
+
+/* Updated Input Styling to match the Pro UI */
+input, select, textarea {
+  width: 100%;
+  padding: 1.2rem !important;
+  background: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 16px !important;
+  color: #fff !important;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary) !important;
+  background: rgba(168, 85, 247, 0.05) !important;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.15);
+}
+
+.submit-btn {
+  margin-top: 1.5rem;
+  padding: 1.2rem !important;
+  background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%) !important;
+  color: white;
+  border: none;
+  border-radius: 16px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 20px -5px rgba(168, 85, 247, 0.4);
+}
+
+.submit-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px -5px rgba(168, 85, 247, 0.6);
+  filter: brightness(1.1);
+}
+
+.submit-btn:active {
+  transform: translateY(-1px);
+}
+
+/* Error and Loader Styling */
 .error-message {
-  background: rgba(239, 68, 68, 0.2);
-  border: 1px solid rgba(239, 68, 68, 0.5);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
   color: #fca5a5;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
+  padding: 1.2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
   text-align: center;
 }
 
 .loader {
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255,255,255,0.3);
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   border-top-color: #fff;
-  animation: spin 1s ease-in-out infinite;
+  animation: spin 0.8s linear infinite;
   display: inline-block;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* Responsive Fixes */
+@media (max-width: 640px) {
+  .form-wrapper {
+    margin: 20px;
+    padding: 2rem;
+  }
+  .form-wrapper h2 {
+    font-size: 1.8rem;
+  }
 }
