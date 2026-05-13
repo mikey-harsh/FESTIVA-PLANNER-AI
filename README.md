@@ -1,3 +1,7 @@
+**[Live Demo: Festiva Planner AI](https://festiva-planner-ai-ui-production.up.railway.app)**
+
+---
+
 # 🚀 Festiva Planner AI: Intelligence-Driven Event Strategy
 
 **Festiva Planner AI** is a modern, full-stack AI application designed to revolutionize event planning. By combining **Machine Learning** for budget optimization, **RAG (Retrieval-Augmented Generation)** for expert domain knowledge, and **Multi-Agent Orchestration**, it provides users with an instant, actionable event roadmap.
@@ -59,6 +63,3 @@ The application features a premium "Night Owl" theme with:
 * **Latency Optimization:** Reduced AI response wait time from 20s to <1s through hybrid caching and local RAG.
 * **Robustness:** Implemented a non-breaking error-handling system that maintains UI integrity during API rate-limiting events.
 * **Security:** Configured `.gitignore` to prevent leakage of sensitive `.env` data and environment-specific artifacts.
-
----
-Developed by **Vikas Bhat** | 2026 Batch CS Engineering
